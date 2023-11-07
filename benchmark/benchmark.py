@@ -42,8 +42,6 @@ class Benchmark:
         :param model: The model to benchmark.
         :param data: The data used to benchmark the model.
         """
-        # Prepare data
-        data.prepare_data()
 
         # Save the initial weights
         weights = deepcopy(model.state_dict())

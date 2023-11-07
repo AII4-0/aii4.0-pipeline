@@ -71,6 +71,10 @@ def main() -> None:
     # Add model specific arguments
     parser = model_cls.add_argparse_args(parser)
 
+    # Add pipeline step arguments
+    parser.add_argument("--prepare", action="store_true", help='Execute preparation step')
+    parser.add_argument("--train", action="store_true", help='Execute training step')
+
     # Parse all arguments
     args = parser.parse_args(args=list_of_args)
 
@@ -79,6 +83,10 @@ def main() -> None:
     # ------------------------------------------------------------------------
     # Create the data module
     data_module = create_from_arguments(DataModule, args)
+
+    # Prepare the data
+    if args.prepare:
+        data_module.run()
 
     # ------------------------------------------------------------------------
     # Model
@@ -92,7 +100,8 @@ def main() -> None:
     benchmark = create_from_arguments(Benchmark, args)
 
     # Benchmark the model
-    benchmark.run(model, data_module)
+    if args.train:
+        benchmark.run(model, data_module)
 
 
 if __name__ == "__main__":

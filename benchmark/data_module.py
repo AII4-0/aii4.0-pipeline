@@ -63,6 +63,13 @@ class DataModule:
         parser.add_argument("--batch_size", type=int, required=True)
         return parent_parser
 
+    def run(self) -> None:
+        """
+        Run data preparation.
+        """
+        # Prepare data
+        self.prepare_data()
+
     def prepare_data(self) -> None:
         """Download (only if needed) and prepare data."""
         # Create the data directory if not exists
@@ -103,6 +110,8 @@ class DataModule:
 
             # Delete the ZIP file
             os.remove(zip_file)
+        else:
+            print("Dataset {0} is already available".format(self.dataset.name))
 
     def __iter__(self):
         self._entity_idx = 0
