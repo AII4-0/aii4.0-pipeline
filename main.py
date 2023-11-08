@@ -1,8 +1,11 @@
+import os
 import sys
 from argparse import ArgumentParser
 
-from benchmark.benchmark import Benchmark
 from benchmark.data_module import DataModule
+from benchmark.eval_module import Evaluate
+from benchmark.test_module import Test
+from benchmark.train_module import Train
 from models.gan import GAN
 from models.lstm import LSTM
 from models.tran_ad import TranAD
@@ -30,7 +33,7 @@ def main() -> None:
         args = augment_arguments_with_yaml(args, args.config)
 
     # Add benchmark arguments
-    parser = Benchmark.add_argparse_args(parser)
+    parser = Train.add_argparse_args(parser)
 
     # Which model?
     parser.add_argument(
@@ -74,6 +77,8 @@ def main() -> None:
     # Add pipeline step arguments
     parser.add_argument("--prepare", action="store_true", help='Execute preparation step')
     parser.add_argument("--train", action="store_true", help='Execute training step')
+    parser.add_argument("--test", action="store_true", help='Execute testing step')
+    parser.add_argument("--evaluate", action="store_true", help='Execute evaluation step')
 
     # Parse all arguments
     args = parser.parse_args(args=list_of_args)
@@ -93,15 +98,39 @@ def main() -> None:
     # ------------------------------------------------------------------------
     model = create_from_arguments(model_cls, args, in_channels=data_module.dataset.dimension)
 
+    # model output directory
+    output_folder = "output"
+    output_dir = os.path.join('.', output_folder)
+
     # ------------------------------------------------------------------------
     # Training
     # ------------------------------------------------------------------------
     # Create the benchmark
-    benchmark = create_from_arguments(Benchmark, args)
+    train = create_from_arguments(Train, args)
+
+    # Train the model
+    if args.train:
+        train.run(model, data_module, output_dir)
+
+    # ------------------------------------------------------------------------
+    # Testing
+    # ------------------------------------------------------------------------
+    # Compute performance metrics
+    test = create_from_arguments(Test, args)
 
     # Benchmark the model
-    if args.train:
-        benchmark.run(model, data_module)
+    if args.test:
+        test.run(model, data_module, output_dir)
+
+    # ------------------------------------------------------------------------
+    # Evaluation
+    # ------------------------------------------------------------------------
+    # Compute global performance metrics
+    evaluate = create_from_arguments(Evaluate, args)
+
+    # Evaluate the model
+    if args.evaluate:
+        evaluate.run(model, data_module, output_dir)
 
 
 if __name__ == "__main__":

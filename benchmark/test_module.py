@@ -1,8 +1,7 @@
 from argparse import ArgumentParser
-from copy import deepcopy
+import os
 
 import torch
-from torch import Tensor
 
 from benchmark.data_module import DataModule
 from benchmark.model_module import ModelModule
@@ -12,16 +11,14 @@ from metrics.point_adjustment import adjust_pred
 from metrics.thresholding import best_threshold
 
 
-class Benchmark:
-    """This class manages the benchmarking of a model."""
+class Test:
+    """This class manages the testing of a model."""
 
-    def __init__(self, epochs: int) -> None:
+    def __init__(self) -> None:
         """
         Create an object of `Trainer` class.
 
-        :param epochs: The number of epochs.
         """
-        self._epochs = epochs
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -31,20 +28,21 @@ class Benchmark:
         :param parent_parser: The parent `ArgumentParser`.
         :return: The extended argparse.
         """
-        parser = parent_parser.add_argument_group("Benchmark")
-        parser.add_argument("--epochs", type=int, required=True)
         return parent_parser
 
-    def run(self, model: ModelModule, data: DataModule) -> None:
+    def run(self, model: ModelModule, data: DataModule, output_dir: str) -> None:
         """
         Run a benchmark of a model.
 
         :param model: The model to benchmark.
         :param data: The data used to benchmark the model.
+        :param output_dir: The input model directory.
         """
 
-        # Save the initial weights
-        weights = deepcopy(model.state_dict())
+        models_dir = os.path.join(output_dir, "models")
+        if not os.path.exists(models_dir):
+            print("Models directory {0} does not exist".format(models_dir))
+            return
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)
@@ -58,33 +56,16 @@ class Benchmark:
 
         # Iterate over entities
         for entity, (train_dataloader, test_dataloader) in enumerate(data):
-            # Restore the initial weights
-            model.load_state_dict(weights)
 
-            # Get the optimizer
-            optimizer = model.configure_optimizers()
+            # Define saved model path for each entity
+            model_file = os.path.join(models_dir, "model_{0}_data_{1}_entity_{2}.pth".format(model.__class__.__name__,
+                                                                                             data.dataset.name, entity))
 
-            # Iterate over epochs
-            for epoch in range(self._epochs):
+            # Load the saved model's state dictionary
+            state_dict = torch.load(model_file)
 
-                # Create a list to store the epoch's losses
-                losses = []
-
-                # Iterate over train batches
-                for batch in train_dataloader:
-                    # Perform a train step
-                    loss = model.training_step(batch)
-
-                    # Backward and optimize
-                    loss.backward()
-                    optimizer.step()
-                    optimizer.zero_grad()
-
-                    # Add the current loss to the list
-                    losses.append(loss.item())
-
-                # Logging
-                print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
+            # Load the state dictionary into the model
+            model.load_state_dict(state_dict)
 
             # Set the model to eval mode
             model.eval()
@@ -156,49 +137,8 @@ class Benchmark:
                 # Set the model to train mode
                 model.train()
 
-        # Compute the global precision
-        gl_precision = precision_from_confusion_matrix(gl_tp, gl_tn, gl_fp, gl_fn)
-        gl_precision_adj = precision_from_confusion_matrix(gl_tp_adj, gl_tn_adj, gl_fp_adj, gl_fn_adj)
+        gl_matrix = [gl_tp, gl_tp_adj, gl_tn, gl_tn_adj, gl_fp, gl_fp_adj, gl_fn, gl_fn_adj]
+        gl_matrix_file = os.path.join(models_dir, "matrix_{0}_data_{1}.pth".format(model.__class__.__name__, data.dataset.name))
 
-        # Compute the global recall
-        gl_recall = recall_from_confusion_matrix(gl_tp, gl_tn, gl_fp, gl_fn)
-        gl_recall_adj = recall_from_confusion_matrix(gl_tp_adj, gl_tn_adj, gl_fp_adj, gl_fn_adj)
-
-        # Compute the global F1 scores
-        gl_f1_score = f1_score_from_confusion_matrix(gl_tp, gl_tn, gl_fp, gl_fn)
-        gl_f1_score_adj = f1_score_from_confusion_matrix(gl_tp_adj, gl_tn_adj, gl_fp_adj, gl_fn_adj)
-
-        # Print the global metrics
-        self._print_global_metrics({
-            "Precision": gl_precision,
-            "Precision adjusted": gl_precision_adj,
-            "Recall": gl_recall,
-            "Recall adjusted": gl_recall_adj,
-            "F1 score": gl_f1_score,
-            "F1 score adjusted": gl_f1_score_adj
-        })
-
-    @staticmethod
-    def _print_global_metrics(metrics: dict[str, Tensor]) -> None:
-        # Compute the max lengths of the key and the value
-        max_len_key = max([len(k) for k in metrics.keys()])
-        max_len_value = max([len(str(v.numpy())) for v in metrics.values()])
-
-        # Compute the width
-        width = 3 * 5 + max_len_key + max_len_value
-
-        # Header
-        left_pad = (width - 14) // 2
-        print("─" * width)
-        print((" " * left_pad) + "Global metrics")
-        print("─" * width)
-
-        # Rows
-        for k, v in metrics.items():
-            v = str(v.numpy())
-            left_pad = (max_len_key - len(k)) // 2
-            middle_pad = max_len_key - len(k) - left_pad + 5 + (max_len_value - len(v)) // 2
-            print("     " + (" " * left_pad) + k + (" " * middle_pad) + v)
-
-        # Footer
-        print("─" * width)
+        # Save global confusion matrix
+        torch.save(gl_matrix, gl_matrix_file)
