@@ -37,8 +37,8 @@ class Evaluate:
         """
 
         # Assuming you have the path to the matrix JSON file
-        models_dir = os.path.join(output_dir, "models")
-        gl_matrix_file = os.path.join(models_dir, "matrix_{0}_data_{1}.pth".format(model.__class__.__name__, data.dataset.name))
+        metrics_dir = os.path.join(output_dir, "confusion")
+        gl_matrix_file = os.path.join(metrics_dir, "matrix_{0}_data_{1}.pth".format(model.__class__.__name__, data.dataset.name))
 
         if not os.path.exists(gl_matrix_file):
             print("Matrix file {0} does not exist".format(gl_matrix_file))

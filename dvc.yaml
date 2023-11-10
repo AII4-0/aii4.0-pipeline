@@ -1,0 +1,34 @@
+stages:
+  prepare:
+    cmd: python3 main.py --config params.yaml --prepare
+    deps:
+    - benchmark/data_module.py
+#    params:
+#    - prepare
+    outs:
+    - data
+  train:
+    cmd: python3 main.py --config params.yaml --train
+    deps:
+    - benchmark/train_module.py
+    - data
+#    params:
+#    - train
+    outs:
+    - output/models
+  test:
+    cmd: python3 main.py --config params.yaml --test
+    deps:
+    - benchmark/test_module.py
+    - output/models
+#    params:
+#    - test
+    outs:
+    - output/confusion
+  evaluate:
+    cmd: python3 main.py --config params.yaml --evaluate
+    deps:
+    - benchmark/eval_module.py
+    - output/confusion
+    metrics:
+    - output/metrics/metrics.json
