@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 
 from datasets.datasets import Datasets
 from datasets.time_series_dataset import TimeSeriesDataset
+from utils import constants
 from utils.download_progress_bar import DownloadProgressBar
 
 
@@ -47,18 +48,7 @@ class DataModule:
         """
         parser = parent_parser.add_argument_group("Data module")
         parser.add_argument("--data_dir", type=str, default="data")
-        parser.add_argument(
-            "--dataset",
-            choices=[
-                "KDD-TSAD",
-                "NASA-MSL",
-                "NASA-SMAP",
-                "SMD",
-                "SWAT",
-                "WADI"
-            ],
-            required=True
-        )
+        parser.add_argument("--dataset", choices=constants.DATASET_NAMES, required=True)
         parser.add_argument("--window_size", type=int, required=True)
         parser.add_argument("--batch_size", type=int, required=True)
         return parent_parser
@@ -118,20 +108,29 @@ class DataModule:
         return self
 
     def __next__(self):
-        # Create the scaler
-        scaler = MinMaxScaler()
-
         # Check if the entity index is valid
         try:
             self.dataset.entities[self._entity_idx]
         except IndexError:
             raise StopIteration
 
+        # Get the data loaders
+        train_dataloader, test_dataloader = self[self._entity_idx]
+
+        # Increment the entity index
+        self._entity_idx += 1
+
+        return train_dataloader, test_dataloader
+
+    def __getitem__(self, idx):
+        # Create the scaler
+        scaler = MinMaxScaler()
+
         # Create the train datasets
         train_dataset = TimeSeriesDataset(
             data_dir=self._data_dir,
             dataset=self.dataset,
-            entity=self.dataset.entities[self._entity_idx],
+            entity=self.dataset.entities[idx],
             scaler=scaler,
             window_size=self._window_size,
             train=True
@@ -141,7 +140,7 @@ class DataModule:
         test_dataset = TimeSeriesDataset(
             data_dir=self._data_dir,
             dataset=self.dataset,
-            entity=self.dataset.entities[self._entity_idx],
+            entity=self.dataset.entities[idx],
             scaler=scaler,
             window_size=self._window_size,
             train=False
