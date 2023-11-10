@@ -1,9 +1,12 @@
+# Python
 .python-version
 .venv
 __pycache__
 
-# Project specific
+# IDEs
 .idea
 .fleet
-data
 
+# Project specific
+/data
+/output
