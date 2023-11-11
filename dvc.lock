@@ -3,7 +3,7 @@ stages:
   prepare:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
       LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
-      1 --learning_rate 0.001 --step prepare
+      1 --learning_rate 0.001 --stage prepare
     deps:
     - path: benchmark/data_module.py
       hash: md5
@@ -24,7 +24,7 @@ stages:
   train:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
       LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
-      1 --learning_rate 0.001 --step train
+      1 --learning_rate 0.001 --stage train
     deps:
     - path: benchmark/train_module.py
       hash: md5
@@ -48,13 +48,13 @@ stages:
     outs:
     - path: output/models
       hash: md5
-      md5: 4cbc51a3f1d79552ab47cdeed9ae8292.dir
+      md5: fe1b139070ece3ab1046c0c21617ab58.dir
       size: 85628794
       nfiles: 27
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
       LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
-      1 --learning_rate 0.001 --step test
+      1 --learning_rate 0.001 --stage test
     deps:
     - path: benchmark/test_module.py
       hash: md5
@@ -62,19 +62,19 @@ stages:
       size: 5631
     - path: output/models
       hash: md5
-      md5: 4cbc51a3f1d79552ab47cdeed9ae8292.dir
+      md5: fe1b139070ece3ab1046c0c21617ab58.dir
       size: 85628794
       nfiles: 27
     outs:
     - path: output/confusion
       hash: md5
-      md5: da09f755035350e898307958d61b1afc.dir
+      md5: cec2ee1bfdfaad5180e2bffe458e3bee.dir
       size: 3096
       nfiles: 1
   evaluate:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
       LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
-      1 --learning_rate 0.001 --step evaluate
+      1 --learning_rate 0.001 --stage evaluate
     deps:
     - path: benchmark/eval_module.py
       hash: md5
@@ -82,11 +82,11 @@ stages:
       size: 4865
     - path: output/confusion
       hash: md5
-      md5: da09f755035350e898307958d61b1afc.dir
+      md5: cec2ee1bfdfaad5180e2bffe458e3bee.dir
       size: 3096
       nfiles: 1
     outs:
     - path: output/metrics/metrics.json
       hash: md5
-      md5: f04890e1ca9fe8f95eea25715c2bcc6e
-      size: 219
+      md5: 809599fa1ae240accf45ba1271aa7782
+      size: 216

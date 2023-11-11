@@ -1,6 +1,6 @@
 stages:
   prepare:
-    cmd: python3 main.py ${prepare} ${train} --prepare
+    cmd: python3 main.py ${prepare} ${train} --stage prepare
     deps:
     - benchmark/data_module.py
     params:
@@ -8,7 +8,7 @@ stages:
     outs:
     - data
   train:
-    cmd: python3 main.py ${prepare} ${train} --train
+    cmd: python3 main.py ${prepare} ${train} --stage train
     deps:
     - benchmark/train_module.py
     - data
@@ -17,14 +17,14 @@ stages:
     outs:
     - output/models
   test:
-    cmd: python3 main.py ${prepare} ${train} --test
+    cmd: python3 main.py ${prepare} ${train} --stage test
     deps:
     - benchmark/test_module.py
     - output/models
     outs:
     - output/confusion
   evaluate:
-    cmd: python3 main.py ${prepare} ${train} --evaluate
+    cmd: python3 main.py ${prepare} ${train} --stage evaluate
     deps:
     - benchmark/eval_module.py
     - output/confusion

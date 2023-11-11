@@ -75,10 +75,16 @@ def main() -> None:
     parser = model_cls.add_argparse_args(parser)
 
     # Add pipeline step arguments
-    parser.add_argument("--prepare", action="store_true", help='Execute preparation step')
-    parser.add_argument("--train", action="store_true", help='Execute training step')
-    parser.add_argument("--test", action="store_true", help='Execute testing step')
-    parser.add_argument("--evaluate", action="store_true", help='Execute evaluation step')
+    parser.add_argument(
+        "--stage",
+        choices=[
+            "prepare",
+            "train",
+            "test",
+            "evaluate",
+        ],
+        required=False
+    )
 
     # Parse all arguments
     args = parser.parse_args(args=list_of_args)
@@ -90,7 +96,7 @@ def main() -> None:
     data_module = create_from_arguments(DataModule, args)
 
     # Prepare the data
-    if args.prepare:
+    if args.stage == "prepare":
         data_module.run()
 
     # ------------------------------------------------------------------------
@@ -109,7 +115,7 @@ def main() -> None:
     train = create_from_arguments(Train, args)
 
     # Train the model
-    if args.train:
+    if args.stage == "train":
         train.run(model, data_module, output_dir)
 
     # ------------------------------------------------------------------------
@@ -119,7 +125,7 @@ def main() -> None:
     test = create_from_arguments(Test, args)
 
     # Benchmark the model
-    if args.test:
+    if args.stage == "test":
         test.run(model, data_module, output_dir)
 
     # ------------------------------------------------------------------------
@@ -129,7 +135,7 @@ def main() -> None:
     evaluate = create_from_arguments(Evaluate, args)
 
     # Evaluate the model
-    if args.evaluate:
+    if args.stage == "evaluate":
         evaluate.run(model, data_module, output_dir)
 
 
