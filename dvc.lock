@@ -78,14 +78,18 @@ stages:
     deps:
     - path: benchmark/eval_module.py
       hash: md5
-      md5: f8e234fef10cd7f6adcf3d99055fab2d
-      size: 4865
+      md5: dd2fb957b26426032e1e7800b46e97a9
+      size: 6242
     - path: output/confusion
       hash: md5
       md5: cec2ee1bfdfaad5180e2bffe458e3bee.dir
       size: 3096
       nfiles: 1
     outs:
+    - path: output/metrics/confusion_matrix.png
+      hash: md5
+      md5: 9fc1fd1078ea7ad597f52084f289fa23
+      size: 23763
     - path: output/metrics/metrics.json
       hash: md5
       md5: 809599fa1ae240accf45ba1271aa7782

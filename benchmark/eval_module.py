@@ -4,6 +4,8 @@ import os
 
 import torch
 from torch import Tensor
+import matplotlib.pyplot as plt
+import numpy as np
 
 from benchmark.data_module import DataModule
 from benchmark.model_module import ModelModule
@@ -93,6 +95,10 @@ class Evaluate:
             "F1 score adjusted": gl_f1_score_adj
         }, output_dir)
 
+        # Plot confusion matrix
+        cm_list = [gl_tn_adj, gl_fp_adj, gl_fn_adj, gl_tp_adj]
+        self._plot_global_confusion_matrix(cm_list, output_dir)
+
     @staticmethod
     def _print_global_metrics(metrics: dict[str, Tensor]) -> None:
         # Compute the max lengths of the key and the value
@@ -135,3 +141,40 @@ class Evaluate:
         # Write results to json file
         with open(eval_file, 'w') as json_file:
             json.dump(json_dict, json_file)
+
+
+    @staticmethod
+    def _plot_global_confusion_matrix(cm_list: list[int], output_dir: str) -> None:
+
+        cm_array = np.array(cm_list)
+        cm = cm_array.reshape((2, 2))
+
+        # Calculate rates
+        total = np.sum(cm)
+        rates = cm/total
+
+        fig, ax = plt.subplots()
+
+        # Create a heatmap, or colored grid
+        cax = ax.matshow(cm, cmap='Blues')
+        cbar = fig.colorbar(cax)
+
+        # Add labels, title and adjust x,y axis ticks
+        for (i, j), z in np.ndenumerate(cm):
+            ax.text(j, i, '{:.2%}\n{}'.format(rates[i, j], z), ha='center', va='center')
+
+        plt.title('Confusion Matrix')
+
+        # Set x labels at the bottom
+        ax.xaxis.set_ticks(np.arange(2))
+        ax.xaxis.set_tick_params(labeltop=False, labelbottom=True)
+        ax.xaxis.set_ticks_position('bottom')
+        ax.yaxis.set_ticks(np.arange(2))
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        ax.set_xticklabels([0, 1])
+        ax.set_yticklabels([0, 1])
+
+        # Save the figure
+        confusion_matrix_plt = os.path.join(output_dir, 'metrics', 'confusion_matrix.png')
+        plt.savefig(confusion_matrix_plt)

@@ -30,3 +30,5 @@ stages:
     - output/confusion
     metrics:
     - output/metrics/metrics.json
+    plots:
+    - output/metrics/confusion_matrix.png
