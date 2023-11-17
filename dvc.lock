@@ -1,20 +1,22 @@
 schema: '2.0'
 stages:
   prepare:
-    cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
-      GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --export_model model --stage prepare
+    cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --start_index_inputs_exported_in_c
+      0 --n_inputs_exported_in_c 0 --model GAN --epochs 10 --hidden_size 128 --prediction_length
+      1 --num_layers 3 --learning_rate 0.001 --export_model model --stage prepare
     deps:
     - path: benchmark/data_module.py
       hash: md5
-      md5: 7f7bcd66ca3605bba73373f74bfbe6e6
-      size: 5121
+      md5: 7675a03b9b42e70155753af7f0edc555
+      size: 5845
     params:
       params.yaml:
         prepare:
           dataset: NASA-MSL
           batch_size: 512
           window_size: 100
+          start_index_inputs_exported_in_c: 0
+          n_inputs_exported_in_c: 0
     outs:
     - path: data
       hash: md5

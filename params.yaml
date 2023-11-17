@@ -2,6 +2,7 @@ prepare:
   dataset: NASA-MSL
   batch_size: 512
   window_size: 100
+  n_inputs_exported_in_c: 0
 train:
   model: GAN
   epochs: 10

@@ -20,7 +20,7 @@ class TimeSeriesDataset(Dataset):
                  scaler: Union[MinMaxScaler, StandardScaler, RobustScaler],
                  window_size: int,
                  train: bool,
-                 export_data_in_c: bool = False) -> None:
+                 n_inputs_exported_in_c: int = 0) -> None:
         """
         Create an object of the `TimeSeriesDataset` class.
 
@@ -30,7 +30,7 @@ class TimeSeriesDataset(Dataset):
         :param scaler: The scaler that should be used.
         :param window_size: The size of the sliding window.
         :param train: A flag to know if it is the train or the test set.
-        :param export_data_in_c: A flag to export the data in C.
+        :param n_inputs_exported_in_c: A flag to export n data inputs in C.
         """
         # Build the path to the CSV file
         path = os.path.join(data_dir, dataset.name, entity + "." + ("train" if train else "test") + ".csv")
@@ -62,10 +62,13 @@ class TimeSeriesDataset(Dataset):
         self._features = torch.tensor(features)
         self._labels = torch.tensor(labels)
         self._train = train
-        self._export_data_in_c = export_data_in_c
+        self._n_inputs_exported_in_c = n_inputs_exported_in_c
 
         # Export the data in C
-        if self._export_data_in_c:
+        if self._n_inputs_exported_in_c > 0:
+            # Adapat _n_inputs_exported_in_c if the number of input is higher than the number of inputs of the dataset
+            self._n_inputs_exported_in_c = self._features.size(0) if self._n_inputs_exported_in_c > self._features.size(0) else self._n_inputs_exported_in_c
+
             # Loop on the selected scv file
             path_scv_file = os.path.join(data_dir, dataset.name, entity + "." + ("train" if train else "test") + ".csv")
 
@@ -75,8 +78,8 @@ class TimeSeriesDataset(Dataset):
             path_h_file = os.path.join(path_h_file, file_name + ".h")
             open(path_h_file, 'w').close()
 
-            # Input shape : 1 x 100 x 1
-            # Penser faire un tableau 2D avec [0][X] == valeur du signal et [1][X] == label
+            # Input shape : 1 x WindowSize x 1  or  1 x WindowSize x 38
+            # Label :       1 x WindowSize      or  1 x WindowSize
 
             # append the raw data to the file
             with open(path_h_file, "a") as file:
@@ -84,10 +87,10 @@ class TimeSeriesDataset(Dataset):
                 file.write("\n#ifndef " + file_name + "_H_\n#define " + file_name + "_H_\n\n")
 
                 # Save the dataset values
-                file.write("const float " + file_name + "[" + str(self._features.size(0)) + "][" + str(window_size) + "][" + str(dataset.dimension) + "] = {\n")
+                file.write("const float " + file_name + "[" + str(self._n_inputs_exported_in_c) + "][" + str(window_size) + "][" + str(dataset.dimension) + "] = {\n")
 
                 # array[iInputs][iWindows][iValues]
-                for iInputs in range(self._features.size(0)): # Save the inputs values (iWindows)
+                for iInputs in range(self._n_inputs_exported_in_c): # Save the inputs values (iWindows)
                     file.write("{\n")
                     for iWindows in range(window_size):   # Save windows values (iValues)
                         file.write("{")
@@ -97,16 +100,16 @@ class TimeSeriesDataset(Dataset):
                 file.write("};\n")
 
                 # Save the labels values
-                file.write("const float " + file_name + "[" + str(self._labels.size(0)) + "][" + str(window_size) + "] = {\n")
+                file.write("const float " + file_name + "[" + str(self._n_inputs_exported_in_c) + "][" + str(window_size) + "] = {\n")
 
-                # array[iInputs][iWindows][iValues]
+                # array[iInputs][iWindows]
                 for iInputs in range(self._labels.size(0)): # Save the inputs values (iWindows)
                     file.write("{\n")
                     np.savetxt(file, self._labels[iInputs], fmt='%f', delimiter=',', newline=',\n')
                     file.write("},\n")
                 file.write("};\n")
 
-                file.write("const unsigned long " + file_name + "_nInputs = " + str(self._features.size(0)) + ";\n")
+                file.write("const unsigned long " + file_name + "_nInputs = " + str(self._n_inputs_exported_in_c) + ";\n")
                 file.write("const unsigned long " + file_name + "_window_size = " + str(window_size) + ";\n")
                 file.write("const unsigned long " + file_name + "_dimension = " + str(dataset.dimension) + ";\n")
                 file.write("\n#endif\n")
