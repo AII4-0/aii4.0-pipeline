@@ -3,6 +3,7 @@ from copy import deepcopy
 import os
 
 import torch
+from torch.utils.tensorboard import SummaryWriter
 
 from benchmark.data_module import DataModule
 from benchmark.model_module import ModelModule
@@ -45,6 +46,9 @@ class Train:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
+        # Create a TensorBoard writer
+        tb_writer = SummaryWriter(log_dir=output_dir)
+
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
@@ -75,9 +79,16 @@ class Train:
                     # Add the current loss to the list
                     losses.append(loss.item())
 
+                # Logging to TensorBoard
+                average_loss = sum(losses) / len(losses)
+                tb_writer.add_scalar(f'Entity_{entity}/Train_Loss', average_loss, epoch)
+
                 # Logging
-                print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
+                print(f"Entity {entity} | Train epoch {epoch} | Loss: {average_loss}")
 
                 # Save state dictionary for each entity
                 model_file = os.path.join(output_dir, "model_{0}_data_{1}_entity_{2}.pth".format(model.__class__.__name__, data.dataset.name, entity))
                 torch.save(model.state_dict(), model_file)
+
+        # Close the TensorBoard writer
+        tb_writer.close()
