@@ -2,7 +2,7 @@ schema: '2.0'
 stages:
   prepare:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
-      LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
+      LSTM --epochs 5 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
       1 --learning_rate 0.001 --stage prepare
     deps:
     - path: benchmark/data_module.py
@@ -23,7 +23,7 @@ stages:
       nfiles: 81
   train:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
-      LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
+      LSTM --epochs 5 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
       1 --learning_rate 0.001 --stage train
     deps:
     - path: benchmark/train_module.py
@@ -39,7 +39,7 @@ stages:
       params.yaml:
         train:
           model: LSTM
-          epochs: 10
+          epochs: 5
           hidden_size: 256
           num_layers: 2
           dropout: 0
@@ -48,12 +48,12 @@ stages:
     outs:
     - path: output/models
       hash: md5
-      md5: fe1b139070ece3ab1046c0c21617ab58.dir
+      md5: c5889a06c076be3ed7d6d477ab9c4d10.dir
       size: 85628794
       nfiles: 27
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
-      LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
+      LSTM --epochs 5 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
       1 --learning_rate 0.001 --stage test
     deps:
     - path: benchmark/test_module.py
@@ -62,18 +62,18 @@ stages:
       size: 5631
     - path: output/models
       hash: md5
-      md5: fe1b139070ece3ab1046c0c21617ab58.dir
+      md5: c5889a06c076be3ed7d6d477ab9c4d10.dir
       size: 85628794
       nfiles: 27
     outs:
     - path: output/confusion
       hash: md5
-      md5: cec2ee1bfdfaad5180e2bffe458e3bee.dir
+      md5: f24846b53113cbc9f955c418d7cbcc3b.dir
       size: 3096
       nfiles: 1
   evaluate:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 1024 --window_size 100 --model
-      LSTM --epochs 10 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
+      LSTM --epochs 5 --hidden_size 256 --num_layers 2 --dropout 0 --prediction_length
       1 --learning_rate 0.001 --stage evaluate
     deps:
     - path: benchmark/eval_module.py
@@ -82,15 +82,15 @@ stages:
       size: 6242
     - path: output/confusion
       hash: md5
-      md5: cec2ee1bfdfaad5180e2bffe458e3bee.dir
+      md5: f24846b53113cbc9f955c418d7cbcc3b.dir
       size: 3096
       nfiles: 1
     outs:
     - path: output/metrics/confusion_matrix.png
       hash: md5
-      md5: 9fc1fd1078ea7ad597f52084f289fa23
-      size: 23763
+      md5: b9b39617ff190539be8e953f2b853389
+      size: 23798
     - path: output/metrics/metrics.json
       hash: md5
-      md5: 809599fa1ae240accf45ba1271aa7782
-      size: 216
+      md5: b8c6233e7a765c74e6ac4859cb8a6276
+      size: 219

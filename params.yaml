@@ -4,7 +4,7 @@ prepare:
   window_size: 100
 train:
   model: LSTM
-  epochs: 10
+  epochs: 5
   hidden_size: 256
   num_layers: 2
   dropout: 0
