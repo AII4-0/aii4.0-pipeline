@@ -3,6 +3,8 @@ from copy import deepcopy
 import os
 
 from mlem.api import save
+import torch
+import yaml
 
 from benchmark.data_module import DataModule
 from benchmark.model_module import ModelModule
@@ -40,6 +42,10 @@ class Train:
         :param output_dir: The output directory.
         """
 
+        # Load parameters
+        prepare_params = yaml.safe_load(open("params.yaml"))["prepare"]
+        train_params = yaml.safe_load(open("params.yaml"))["train"]
+
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
@@ -59,6 +65,7 @@ class Train:
 
                 # Iterate over train batches
                 for batch in train_dataloader:
+
                     # Perform a train step
                     loss = model.training_step(batch)
 
@@ -73,6 +80,11 @@ class Train:
                 # Logging
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
+        # Create sample data
+        hidden_size = train_params["hidden_size"]
+        window_size = prepare_params["window_size"]
+        sample_data = torch.randn(hidden_size, window_size - 1)
+
         # Save model using MLEM API
         model_path = "model"
-        save(model, model_path, sample_data=None, preprocess=None, postprocess=None)
+        save(model, model_path, sample_data=sample_data, preprocess=None, postprocess=None)
