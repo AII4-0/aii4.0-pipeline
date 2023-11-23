@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import os
 
+from mlem.api import load
 import torch
 
 from benchmark.data_module import DataModule
@@ -42,8 +43,8 @@ class Test:
         # Define saved model path
         model_path = "model"
 
-        # Retrieve the state dictionary
-        model_weights_dict = torch.load(model_path)
+        # Retrieve the state dictionary using MLEM
+        model_weights_dict = load(model_path)
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)
@@ -138,7 +139,8 @@ class Test:
             os.makedirs(output_dir)
 
         gl_matrix = [gl_tp, gl_tp_adj, gl_tn, gl_tn_adj, gl_fp, gl_fp_adj, gl_fn, gl_fn_adj]
-        gl_matrix_file = os.path.join(output_dir, "matrix_{0}_data_{1}.pth".format(model.__class__.__name__, data.dataset.name))
+        gl_matrix_file = os.path.join(output_dir,
+                                      "matrix_{0}_data_{1}.pth".format(model.__class__.__name__, data.dataset.name))
 
         # Save global confusion matrix
         torch.save(gl_matrix, gl_matrix_file)

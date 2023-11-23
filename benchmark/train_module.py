@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from copy import deepcopy
 import os
 
-import torch
+from mlem.api import save
 
 from benchmark.data_module import DataModule
 from benchmark.model_module import ModelModule
@@ -79,6 +79,6 @@ class Train:
             # add weights to dict
             model_weights_dict[f"entity_{entity}"] = model.state_dict()
 
-        # Save state dictionary
+        # Save state dictionary using MLEM API
         model_path = "model"
-        torch.save(model_weights_dict, model_path)
+        save(model_weights_dict, model_path, sample_data=None, preprocess=None, postprocess=None)
