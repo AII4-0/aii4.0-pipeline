@@ -44,6 +44,12 @@ class Test:
             print("Models directory {0} does not exist".format(models_dir))
             return
 
+        # Define saved model path
+        model_file = os.path.join(models_dir, "model_{0}_{1}.pth".format(model.__class__.__name__, data.dataset.name))
+
+        # Retrieve the state dictionary
+        model_weights_dict = torch.load(model_file)
+
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)
         gl_tp_adj = torch.tensor(0)
@@ -57,14 +63,8 @@ class Test:
         # Iterate over entities
         for entity, (train_dataloader, test_dataloader) in enumerate(data):
 
-            # Define saved model path for each entity
-            model_file = os.path.join(models_dir, "model_{0}_data_{1}_entity_{2}.pth".format(model.__class__.__name__,
-                                                                                             data.dataset.name, entity))
-
-            # Load the saved model's state dictionary
-            state_dict = torch.load(model_file)
-
             # Load the state dictionary into the model
+            state_dict = model_weights_dict[f"entity_{entity}"]
             model.load_state_dict(state_dict)
 
             # Set the model to eval mode

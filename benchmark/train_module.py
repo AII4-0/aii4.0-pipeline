@@ -48,6 +48,9 @@ class Train:
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
+        # init weight dict
+        model_weights_dict = {}
+
         # Iterate over entities
         for entity, (train_dataloader, test_dataloader) in enumerate(data):
             # Restore the initial weights
@@ -78,6 +81,9 @@ class Train:
                 # Logging
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
-                # Save state dictionary for each entity
-                model_file = os.path.join(output_dir, "model_{0}_data_{1}_entity_{2}.pth".format(model.__class__.__name__, data.dataset.name, entity))
-                torch.save(model.state_dict(), model_file)
+            # add weights to dict
+            model_weights_dict[f"entity_{entity}"] = model.state_dict()
+
+        # Save state dictionary
+        model_file = os.path.join(output_dir, "model_{0}_{1}.pth".format(model.__class__.__name__, data.dataset.name))
+        torch.save(model_weights_dict, model_file)
