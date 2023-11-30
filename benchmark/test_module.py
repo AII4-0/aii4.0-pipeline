@@ -43,8 +43,8 @@ class Test:
         # Define saved model path
         model_path = "model"
 
-        # Retrieve the state dictionary using MLEM
-        model_weights_dict = load(model_path)
+        # Retrieve model using MLEM
+        model = load(model_path)
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)
@@ -58,10 +58,6 @@ class Test:
 
         # Iterate over entities
         for entity, (train_dataloader, test_dataloader) in enumerate(data):
-
-            # Load the state dictionary into the model
-            state_dict = model_weights_dict[f"entity_{entity}"]
-            model.load_state_dict(state_dict)
 
             # Set the model to eval mode
             model.eval()

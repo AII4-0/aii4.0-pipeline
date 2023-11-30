@@ -43,14 +43,11 @@ class Train:
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
-        # init weight dict
-        model_weights_dict = {}
+        # Load the initial weights
+        model.load_state_dict(weights)
 
         # Iterate over entities
         for entity, (train_dataloader, test_dataloader) in enumerate(data):
-            # Restore the initial weights
-            model.load_state_dict(weights)
-
             # Get the optimizer
             optimizer = model.configure_optimizers()
 
@@ -76,9 +73,6 @@ class Train:
                 # Logging
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
-            # add weights to dict
-            model_weights_dict[f"entity_{entity}"] = model.state_dict()
-
-        # Save state dictionary using MLEM API
+        # Save model using MLEM API
         model_path = "model"
-        save(model_weights_dict, model_path, sample_data=None, preprocess=None, postprocess=None)
+        save(model, model_path, sample_data=None, preprocess=None, postprocess=None)

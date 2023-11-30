@@ -28,8 +28,8 @@ stages:
     deps:
     - path: benchmark/train_module.py
       hash: md5
-      md5: 9187909fe9269229bb00e62002b45974
-      size: 2611
+      md5: c2a89c2e9b5e8ceb2bade639e7b7b52b
+      size: 2409
     - path: data
       hash: md5
       md5: 766ef5089d137607aba9d47d5fc43b2b.dir
@@ -47,9 +47,8 @@ stages:
     outs:
     - path: model
       hash: md5
-      md5: c51a21225dd03702db626fed314337f7.dir
-      size: 11800512
-      nfiles: 432
+      md5: a98a7ff434f7172513bffc9f0d91c957
+      size: 428518
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
@@ -57,17 +56,16 @@ stages:
     deps:
     - path: benchmark/test_module.py
       hash: md5
-      md5: 6e906cb2b48e93905551d40b9fcaf380
-      size: 5328
+      md5: 3f3619e1bc234f2d65fb20252bd7c2c0
+      size: 5134
     - path: model
       hash: md5
-      md5: c51a21225dd03702db626fed314337f7.dir
-      size: 11800512
-      nfiles: 432
+      md5: a98a7ff434f7172513bffc9f0d91c957
+      size: 428518
     outs:
     - path: output/confusion
       hash: md5
-      md5: 2c12629203a95120bc3533e1ca465207.dir
+      md5: 281f60dc91dc6ec677002c4e85590e03.dir
       size: 3084
       nfiles: 1
   evaluate:
@@ -81,15 +79,15 @@ stages:
       size: 6242
     - path: output/confusion
       hash: md5
-      md5: 2c12629203a95120bc3533e1ca465207.dir
+      md5: 281f60dc91dc6ec677002c4e85590e03.dir
       size: 3084
       nfiles: 1
     outs:
     - path: output/metrics/confusion_matrix.png
       hash: md5
-      md5: 942c068d29ebdde9828bdc1bdee7b23b
-      size: 23089
+      md5: f8f128ebb7aff2cbdd637871ee677e4f
+      size: 22658
     - path: output/metrics/metrics.json
       hash: md5
-      md5: 1f6b0eb011986a3f563708113a6f9f85
-      size: 218
+      md5: 9b79447eb8f8d8489b1b2cb65772de47
+      size: 219
