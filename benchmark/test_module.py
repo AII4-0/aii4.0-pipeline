@@ -39,16 +39,11 @@ class Test:
         :param output_dir: The input model directory.
         """
 
-        models_dir = os.path.join(output_dir, "models")
-        if not os.path.exists(models_dir):
-            print("Models directory {0} does not exist".format(models_dir))
-            return
-
         # Define saved model path
-        model_file = os.path.join(models_dir, "model_{0}_{1}.pth".format(model.__class__.__name__, data.dataset.name))
+        model_path = "model"
 
         # Retrieve the state dictionary
-        model_weights_dict = torch.load(model_file)
+        model_weights_dict = torch.load(model_path)
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)

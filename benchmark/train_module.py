@@ -40,11 +40,6 @@ class Train:
         :param output_dir: The output directory.
         """
 
-        # Create the output models directory if it does not exist
-        output_dir = os.path.join(output_dir, "models")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
@@ -85,5 +80,5 @@ class Train:
             model_weights_dict[f"entity_{entity}"] = model.state_dict()
 
         # Save state dictionary
-        model_file = os.path.join(output_dir, "model_{0}_{1}.pth".format(model.__class__.__name__, data.dataset.name))
-        torch.save(model_weights_dict, model_file)
+        model_path = "model"
+        torch.save(model_weights_dict, model_path)

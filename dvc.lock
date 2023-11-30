@@ -28,8 +28,8 @@ stages:
     deps:
     - path: benchmark/train_module.py
       hash: md5
-      md5: 29375b718d7898575a0b6afc99d0cbb3
-      size: 2828
+      md5: 033a00ab79465e8e4d412763a86f83a3
+      size: 2536
     - path: data
       hash: md5
       md5: 766ef5089d137607aba9d47d5fc43b2b.dir
@@ -45,11 +45,10 @@ stages:
           num_layers: 3
           learning_rate: 0.001
     outs:
-    - path: output/models
+    - path: model
       hash: md5
-      md5: b951a2b20fe207e3f39401e7f5832ee9.dir
-      size: 489282
-      nfiles: 1
+      md5: f03924b6daec8f72272552f1f2d45f2f
+      size: 488126
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
@@ -57,17 +56,16 @@ stages:
     deps:
     - path: benchmark/test_module.py
       hash: md5
-      md5: 02aeec7b986fc4886a4aa0dbc6c14792
-      size: 5544
-    - path: output/models
+      md5: 5b6197fb96d2e9d34e1b0e04c201a073
+      size: 5259
+    - path: model
       hash: md5
-      md5: b951a2b20fe207e3f39401e7f5832ee9.dir
-      size: 489282
-      nfiles: 1
+      md5: f03924b6daec8f72272552f1f2d45f2f
+      size: 488126
     outs:
     - path: output/confusion
       hash: md5
-      md5: b62f655b5a9dadad8386d098ef58c6f5.dir
+      md5: 70af9109a9cc50f6bc6d31abc6c900ad.dir
       size: 3084
       nfiles: 1
   evaluate:
@@ -81,15 +79,15 @@ stages:
       size: 6242
     - path: output/confusion
       hash: md5
-      md5: b62f655b5a9dadad8386d098ef58c6f5.dir
+      md5: 70af9109a9cc50f6bc6d31abc6c900ad.dir
       size: 3084
       nfiles: 1
     outs:
     - path: output/metrics/confusion_matrix.png
       hash: md5
-      md5: f2a4353172bc7ca223f74f49ed283998
-      size: 22679
+      md5: 97d3dc276ac500af1080c27e29bfb265
+      size: 22789
     - path: output/metrics/metrics.json
       hash: md5
-      md5: a8e967e5eec8a3361de3b6577e73c98c
-      size: 218
+      md5: a83312e63609da931f1c3cd20d1804b6
+      size: 217

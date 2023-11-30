@@ -15,12 +15,12 @@ stages:
     params:
     - train
     outs:
-    - output/models
+    - model
   test:
     cmd: python3 main.py ${prepare} ${train} --stage test
     deps:
     - benchmark/test_module.py
-    - output/models
+    - model
     outs:
     - output/confusion
   evaluate:
