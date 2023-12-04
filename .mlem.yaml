@@ -1,4 +1,6 @@
 core:
+  state:
+    uri: gs://aii40mlops
   storage:
     type: dvc
 no_analytics: true
