@@ -12,10 +12,48 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Allow the creation and usage of self-hosted runners
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
+  setup-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Login to Google Cloud
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.CML_GCP_SERVICE_ACCOUNT_KEY }}'
+      - name: Get Google Cloud's Kubernetes credentials
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: 'mlops-kubernetes'
+          location: 'europe-west6-a'
+      - uses: iterative/setup-cml@v2
+        with:
+          version: '0.20.0'
+      - name: Initialize runner on Kubernetes
+        env:
+          REPO_TOKEN: ${{ secrets.CML_PAT }}
+        run: |
+          export KUBERNETES_CONFIGURATION=$(cat $KUBECONFIG)
+          # https://cml.dev/doc/ref/runner
+          # https://registry.terraform.io/providers/iterative/iterative/latest/docs/resources/task#machine-type
+          # https://registry.terraform.io/providers/iterative/iterative/latest/docs/resources/task#{cpu}-{memory}
+          cml runner \
+            --labels="cml-runner" \
+            --cloud="kubernetes" \
+            --cloud-type="1-2000" \
+            --cloud-kubernetes-node-selector="gpu=true" \
+            --single
+
   benchmark-and-report:
     permissions: write-all
-    runs-on: ubuntu-latest
+    needs: setup-runner
+    runs-on: [self-hosted, cml-runner]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
