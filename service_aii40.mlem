@@ -1,0 +1,14 @@
+image_name: mlops-aii40
+image_uri: mlops-aii40:latest
+namespace: live
+object_type: deployment
+registry:
+  host: europe-west6-docker.pkg.dev/aii40-405810/mlops-registry
+  type: remote
+server:
+  type: fastapi
+service_type:
+  type: loadbalancer
+state_manager:
+  uri: gs://aii40mlops
+type: kubernetes
