@@ -78,3 +78,11 @@ jobs:
 
           # Publish the CML report
           cml comment update --target=pr --publish report.md
+
+  deploy:
+    # Runs on main branch only
+    if: github.ref == 'refs/heads/main'
+    needs: benchmark-and-report
+    name: Call Deploy
+    uses: ./.github/workflows/mlops-deploy.yml
+    secrets: inherit
