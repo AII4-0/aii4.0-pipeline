@@ -39,6 +39,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.CML_PAT }}
         run: |
+          # FIXME: See https://github.com/iterative/cml/issues/1415, https://github.com/swiss-ai-center/a-guide-to-mlops/issues/126
           export KUBERNETES_CONFIGURATION=$(cat $KUBECONFIG)
           # https://cml.dev/doc/ref/runner
           # https://registry.terraform.io/providers/iterative/iterative/latest/docs/resources/task#machine-type
