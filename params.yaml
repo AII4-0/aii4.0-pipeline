@@ -9,4 +9,4 @@ train:
   prediction_length: 1
   num_layers: 3
   learning_rate: 0.001
-  export_folder: model
+  export_model: model

@@ -3,12 +3,12 @@ stages:
   prepare:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --stage prepare
+      0.001 --export_model model --stage prepare
     deps:
     - path: benchmark/data_module.py
       hash: md5
-      md5: 5ef4242d47865d7a7a6a3ba774e6922e
-      size: 5063
+      md5: 7f7bcd66ca3605bba73373f74bfbe6e6
+      size: 5121
     params:
       params.yaml:
         prepare:
@@ -24,12 +24,12 @@ stages:
   train:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --stage train
+      0.001 --export_model model --stage train
     deps:
     - path: benchmark/train_module.py
       hash: md5
-      md5: cc68363fc0ec03d0e097cd9df1ce45e6
-      size: 2810
+      md5: 0acf364dd1c5f205cf00c9feda1fd6b3
+      size: 2691
     - path: data
       hash: md5
       md5: 766ef5089d137607aba9d47d5fc43b2b.dir
@@ -44,34 +44,35 @@ stages:
           prediction_length: 1
           num_layers: 3
           learning_rate: 0.001
+          export_model: model
     outs:
     - path: model
       hash: md5
-      md5: f6617ba6464293d670a0ef49d6fabb4b
+      md5: 6e25cdd59d62887b4f1824b98db07a3c
       size: 428518
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --stage test
+      0.001 --export_model model --stage test
     deps:
     - path: benchmark/test_module.py
       hash: md5
-      md5: 3f3619e1bc234f2d65fb20252bd7c2c0
-      size: 5134
+      md5: 95e32e33c61a93aa501606c64aa316e9
+      size: 5297
     - path: model
       hash: md5
-      md5: f6617ba6464293d670a0ef49d6fabb4b
+      md5: 6e25cdd59d62887b4f1824b98db07a3c
       size: 428518
     outs:
     - path: output/confusion
       hash: md5
-      md5: cded9d25d804206dee1d5549fe62cb06.dir
+      md5: cc4511ac7fc45cfb28ee3c023cbc89f0.dir
       size: 3084
       nfiles: 1
   evaluate:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
       GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --stage evaluate
+      0.001 --export_model model --stage evaluate
     deps:
     - path: benchmark/eval_module.py
       hash: md5
@@ -79,15 +80,15 @@ stages:
       size: 6242
     - path: output/confusion
       hash: md5
-      md5: cded9d25d804206dee1d5549fe62cb06.dir
+      md5: cc4511ac7fc45cfb28ee3c023cbc89f0.dir
       size: 3084
       nfiles: 1
     outs:
     - path: output/metrics/confusion_matrix.png
       hash: md5
-      md5: e557b18a3ec9899d5845f5b325ce4700
-      size: 22961
+      md5: c5b720fb8c9c497d6304535bef8f084f
+      size: 23424
     - path: output/metrics/metrics.json
       hash: md5
-      md5: 9a8c0fce8e34f7c6661f1a96ab33ecd4
-      size: 218
+      md5: 5bc54415638b5b1d7208f4966cd2da51
+      size: 219

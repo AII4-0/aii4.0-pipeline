@@ -16,12 +16,12 @@ from metrics.thresholding import best_threshold
 class Test:
     """This class manages the testing of a model."""
 
-    def __init__(self, export_folder: Path = None) -> None:
+    def __init__(self, export_model: Path = None) -> None:
         """
         Create an object of `Trainer` class.
-        :param export_folder: The path to the folder where the model weights should be saved.
+        :param export_model: The path to the file where the model weights should be saved.
         """
-        self._export_folder = export_folder
+        self._export_model = export_model
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -43,8 +43,8 @@ class Test:
         """
 
         # Retrieve model using MLEM
-        if self._export_folder:
-            model = load(self._export_folder)
+        if self._export_model:
+            model = load(self._export_model)
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)
