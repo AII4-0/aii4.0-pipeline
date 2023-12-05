@@ -8,3 +8,5 @@ pyyaml==6.0.1
 dvc[gs]==3.28.0
 matplotlib==3.8.1
 mlem[fastapi,kubernetes]==0.4.14
+tensorflow==2.14.0
+nobuco==0.8.10
