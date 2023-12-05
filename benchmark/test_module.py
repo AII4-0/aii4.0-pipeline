@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import os
+from pathlib import Path
 
 from mlem.api import load
 import torch
@@ -15,11 +16,12 @@ from metrics.thresholding import best_threshold
 class Test:
     """This class manages the testing of a model."""
 
-    def __init__(self) -> None:
+    def __init__(self, export_folder: Path = None) -> None:
         """
         Create an object of `Trainer` class.
-
+        :param export_folder: The path to the folder where the model weights should be saved.
         """
+        self._export_folder = export_folder
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -40,11 +42,9 @@ class Test:
         :param output_dir: The input model directory.
         """
 
-        # Define saved model path
-        model_path = "model"
-
         # Retrieve model using MLEM
-        model = load(model_path)
+        if self._export_folder:
+            model = load(self._export_folder)
 
         # Initialize global confusion matrix variables
         gl_tp = torch.tensor(0)

@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from copy import deepcopy
 import os
+from pathlib import Path
 
 from mlem.api import save
 import torch
@@ -13,13 +14,15 @@ from benchmark.model_module import ModelModule
 class Train:
     """This class manages the training of a model."""
 
-    def __init__(self, epochs: int) -> None:
+    def __init__(self, epochs: int, export_folder: Path = None) -> None:
         """
         Create an object of `Trainer` class.
 
         :param epochs: The number of epochs.
+        :param export_folder: The path to the folder where the model weights should be saved.
         """
         self._epochs = epochs
+        self._export_folder = export_folder
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -31,6 +34,7 @@ class Train:
         """
         parser = parent_parser.add_argument_group("Train")
         parser.add_argument("--epochs", type=int, required=True)
+        parser.add_argument("--export_folder", type=Path)
         return parent_parser
 
     def run(self, model: ModelModule, data: DataModule, output_dir: str) -> None:
@@ -77,5 +81,5 @@ class Train:
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
         # Save model using MLEM API
-        model_path = "model"
-        save(model, model_path, sample_data=None, preprocess=None, postprocess=None)
+        if self._export_folder:
+            save(model, self._export_folder, sample_data=None, preprocess=None, postprocess=None)
