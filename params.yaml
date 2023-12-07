@@ -1,15 +1,16 @@
 prepare:
   dataset: NASA-MSL
-  batch_size: 512
+  batch_size: 1024
   window_size: 100
   start_index_inputs_exported_in_c: 0
   n_inputs_exported_in_c: 0
 train:
-  model: GAN
+  model: LSTM
   epochs: 10
-  hidden_size: 128
+  hidden_size: 256
+  num_layers: 2
+  dropout: 0
   prediction_length: 1
-  num_layers: 3
   learning_rate: 0.001
 convert:
   batch_size: 1
