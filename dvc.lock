@@ -1,9 +1,9 @@
 schema: '2.0'
 stages:
   prepare:
-    cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --model
-      GAN --epochs 10 --hidden_size 128 --prediction_length 1 --num_layers 3 --learning_rate
-      0.001 --stage prepare
+    cmd: python3 main.py --dataset NASA-MSL --batch_size 256 --window_size 100 --model
+      TranAD --epochs 10 --hidden_size 16 --prediction_length 1 --dropout 0 --num_layers
+      3 --learning_rate 0.001 --stage prepare
     deps:
     - path: benchmark/data_module.py
       hash: md5
@@ -13,7 +13,7 @@ stages:
       params.yaml:
         prepare:
           dataset: NASA-MSL
-          batch_size: 512
+          batch_size: 256
           window_size: 100
     outs:
     - path: data
