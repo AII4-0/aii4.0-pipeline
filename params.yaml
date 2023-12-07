@@ -1,11 +1,12 @@
 prepare:
   dataset: NASA-MSL
-  batch_size: 512
+  batch_size: 256
   window_size: 100
 train:
-  model: GAN
+  model: Transformer
   epochs: 10
-  hidden_size: 128
+  num_encoder_layers: 3
+  num_decoder_layers: 3
+  dropout: 0.1
   prediction_length: 1
-  num_layers: 3
   learning_rate: 0.001
