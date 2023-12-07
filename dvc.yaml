@@ -32,3 +32,15 @@ stages:
     - output/metrics/metrics.json
     plots:
     - output/metrics/confusion_matrix.png
+  convert:
+    cmd: python3 main.py ${prepare} ${train} ${convert} --stage convert
+    deps:
+    - benchmark/convert_module.py
+    - model
+    outs:
+    - model.tflite
+    - output/export/model.h
+    - output/export/model.cpp
+    - model_quant.tflite
+    - output/export/model_quant.h
+    - output/export/model_quant.cpp

@@ -80,6 +80,11 @@ class Train:
                 # Logging
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
+            # Save PyTorch model
+            if self._export_model:
+                export_model_dir = os.path.join(output_dir, "model")
+                os.makedirs(export_model_dir, exist_ok=True)
+                torch.save(model, os.path.join(export_model_dir, self._export_model.parent.joinpath(f"{self._export_model.stem}_{entity}.pth")))
+
         # Save model using MLEM API
-        if self._export_model:
-            save(model, self._export_model, sample_data=None, preprocess=None, postprocess=None)
+        save(model, "model", sample_data=None, preprocess=None, postprocess=None)

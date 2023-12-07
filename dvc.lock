@@ -30,8 +30,8 @@ stages:
     deps:
     - path: benchmark/train_module.py
       hash: md5
-      md5: 0acf364dd1c5f205cf00c9feda1fd6b3
-      size: 2691
+      md5: 0b7d16f119d7379b043cd58238147e62
+      size: 2989
     - path: data
       hash: md5
       md5: 766ef5089d137607aba9d47d5fc43b2b.dir
@@ -50,7 +50,7 @@ stages:
     outs:
     - path: model
       hash: md5
-      md5: 2327bd7add3c6d6d9f7261ecdf8f4f58
+      md5: ddabf9011cc3e3e479ad6a88f35b091a
       size: 436966
   test:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --start_index_inputs_exported_in_c
@@ -59,16 +59,16 @@ stages:
     deps:
     - path: benchmark/test_module.py
       hash: md5
-      md5: 95e32e33c61a93aa501606c64aa316e9
-      size: 5297
+      md5: e410bef32e02c4ce04c0a8d574e0b80b
+      size: 5106
     - path: model
       hash: md5
-      md5: 2327bd7add3c6d6d9f7261ecdf8f4f58
+      md5: ddabf9011cc3e3e479ad6a88f35b091a
       size: 436966
     outs:
     - path: output/confusion
       hash: md5
-      md5: 0ccb9fb3dfbdf848c04489649d521d38.dir
+      md5: 9d93a3803920b624a418aa994d6f06c3.dir
       size: 3084
       nfiles: 1
   evaluate:
@@ -82,15 +82,54 @@ stages:
       size: 6242
     - path: output/confusion
       hash: md5
-      md5: 0ccb9fb3dfbdf848c04489649d521d38.dir
+      md5: 9d93a3803920b624a418aa994d6f06c3.dir
       size: 3084
       nfiles: 1
     outs:
     - path: output/metrics/confusion_matrix.png
       hash: md5
-      md5: c683931239623a6fb6ffd6eb002b6ea9
-      size: 23031
+      md5: 9fd25bdc98db593cbe43c63a81ba2649
+      size: 23567
     - path: output/metrics/metrics.json
       hash: md5
-      md5: c65473562df1eb1600d9220241785eec
-      size: 218
+      md5: 4e4f8371993a7edc0057634de70efbe0
+      size: 219
+  convert:
+    cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --start_index_inputs_exported_in_c
+      0 --n_inputs_exported_in_c 0 --model GAN --epochs 10 --hidden_size 128 --prediction_length
+      1 --num_layers 3 --learning_rate 0.001 --export_model model --batch_size 1 --entity
+      0 --stage convert
+    deps:
+    - path: benchmark/convert_module.py
+      hash: md5
+      md5: 5dbe0a3ac29a551ce8b595944ee9b795
+      size: 4985
+    - path: model
+      hash: md5
+      md5: ddabf9011cc3e3e479ad6a88f35b091a
+      size: 436966
+    outs:
+    - path: model.tflite
+      hash: md5
+      md5: debd9a50834672bd07bd796c5375ef52
+      size: 419976
+    - path: model_quant.tflite
+      hash: md5
+      md5: 3053da4402b764e7253ae2af77277cbf
+      size: 110112
+    - path: output/export/model.cpp
+      hash: md5
+      md5: 1514789a1ce3b700f9f4c43888179ddd
+      size: 2649790
+    - path: output/export/model.h
+      hash: md5
+      md5: 671f6ec94bc94e179a7f15ddf49b856a
+      size: 455
+    - path: output/export/model_quant.cpp
+      hash: md5
+      md5: 94e863183392f1094ca4140c403e4d96
+      size: 695284
+    - path: output/export/model_quant.h
+      hash: md5
+      md5: f801edba2d4038e0f686489e7a3af0b2
+      size: 485

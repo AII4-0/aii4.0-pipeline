@@ -6,6 +6,7 @@ from benchmark.data_module import DataModule
 from benchmark.eval_module import Evaluate
 from benchmark.test_module import Test
 from benchmark.train_module import Train
+from benchmark.convert_module import Convert
 from models.gan import GAN
 from models.lstm import LSTM
 from models.tran_ad import TranAD
@@ -34,6 +35,9 @@ def main() -> None:
 
     # Add benchmark arguments
     parser = Train.add_argparse_args(parser)
+    parser = Test.add_argparse_args(parser)
+    parser = Evaluate.add_argparse_args(parser)
+    parser = Convert.add_argparse_args(parser)
 
     # Which model?
     parser.add_argument(
@@ -82,6 +86,7 @@ def main() -> None:
             "train",
             "test",
             "evaluate",
+            "convert",
         ],
         required=False
     )
@@ -137,6 +142,16 @@ def main() -> None:
     # Evaluate the model
     if args.stage == "evaluate":
         evaluate.run(model, data_module, output_dir)
+
+    # ------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------
+    # Convert model
+    convert = create_from_arguments(Convert, args)
+
+    # Convert the model
+    if args.stage == "convert":
+        convert.run(data_module, output_dir)
 
 
 if __name__ == "__main__":
