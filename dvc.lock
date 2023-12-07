@@ -2,8 +2,8 @@ schema: '2.0'
 stages:
   prepare:
     cmd: python3 main.py --dataset NASA-MSL --batch_size 256 --window_size 100 --model
-      TranAD --epochs 10 --hidden_size 16 --prediction_length 1 --dropout 0 --num_layers
-      3 --learning_rate 0.001 --stage prepare
+      Transformer --epochs 10 --num_encoder_layers 3 --num_decoder_layers 3 --dropout
+      0.1 --prediction_length 1 --learning_rate 0.001 --stage prepare
     deps:
     - path: benchmark/data_module.py
       hash: md5
