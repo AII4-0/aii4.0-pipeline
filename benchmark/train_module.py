@@ -42,10 +42,6 @@ class Train:
         :param output_dir: The output directory.
         """
 
-        # Load parameters
-        prepare_params = yaml.safe_load(open("params.yaml"))["prepare"]
-        train_params = yaml.safe_load(open("params.yaml"))["train"]
-
         # Save the initial weights
         weights = deepcopy(model.state_dict())
 
@@ -80,11 +76,6 @@ class Train:
                 # Logging
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
-        # Create sample data
-        hidden_size = train_params["hidden_size"]
-        window_size = prepare_params["window_size"]
-        sample_data = torch.randn(hidden_size, window_size - 1)
-
         # Save model using MLEM API
         model_path = "model"
-        save(model, model_path, sample_data=sample_data, preprocess=None, postprocess=None)
+        save(model, model_path, sample_data=None, preprocess=None, postprocess=None)
