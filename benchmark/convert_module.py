@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 import os
-from pathlib import Path
 
 import nobuco
 import tensorflow as tf
@@ -16,14 +15,12 @@ test_dataloader = None
 class Convert:
     """This class manages the export of a model."""
 
-    def __init__(self, entity: int, export_model: Path = None) -> None:
+    def __init__(self, entity: int) -> None:
         """
         Create an object of `Trainer` class.
         :param entity: The entity to convert.
-        :param export_model: The path to the folder where the exported model is saved.
         """
         self._entity = entity
-        self._export_model = export_model
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -73,10 +70,6 @@ class Convert:
         :param output_dir: The exported model directory.
         """
 
-        # ensure the pytorch model has been created
-        if self._export_model is None:
-            return
-
         # Get the train dataloader for the entity
         global test_dataloader
 
@@ -109,12 +102,12 @@ class Convert:
         tflite_model = tf.lite.TFLiteConverter.from_keras_model(keras_model).convert()
 
         # Save the model
-        with open(self._export_model.parent.joinpath(self._export_model.stem + ".tflite"), "wb") as f:
+        with open("model.tflite", "wb") as f:
             f.write(tflite_model)
 
         # convert to C source code and store it
         print("convert to C source code")
-        self.convert_to_c(tflite_model, self._export_model.stem, os.path.join(output_dir, "export"))
+        self.convert_to_c(tflite_model, "model", os.path.join(output_dir, "export"))
 
         ############################################
         # Convert keras model into quantized tf lite model
@@ -131,8 +124,8 @@ class Convert:
         tflite_model_quant = converter.convert()
 
         # Save the model
-        with open(self._export_model.parent.joinpath(self._export_model.stem + "_quant.tflite"), "wb") as f:
+        with open("model_quant.tflite", "wb") as f:
             f.write(tflite_model_quant)
 
         # convert to C source code and store it
-        self.convert_to_c(tflite_model_quant, self._export_model.stem + "_quant", os.path.join(output_dir, "export"))
+        self.convert_to_c(tflite_model_quant, "model_quant", os.path.join(output_dir, "export"))

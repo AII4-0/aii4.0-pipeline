@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 from copy import deepcopy
 import os
-from pathlib import Path
 
 from mlem.api import save
 import torch
@@ -14,15 +13,13 @@ from benchmark.model_module import ModelModule
 class Train:
     """This class manages the training of a model."""
 
-    def __init__(self, epochs: int, export_model: Path = None) -> None:
+    def __init__(self, epochs: int) -> None:
         """
         Create an object of `Trainer` class.
 
         :param epochs: The number of epochs.
-        :param export_model: The path to the file where the model weights should be saved.
         """
         self._epochs = epochs
-        self._export_model = export_model
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -34,7 +31,6 @@ class Train:
         """
         parser = parent_parser.add_argument_group("Train")
         parser.add_argument("--epochs", type=int, required=True)
-        parser.add_argument("--export_model", type=Path)
         return parent_parser
 
     def run(self, model: ModelModule, data: DataModule, output_dir: str) -> None:
@@ -65,7 +61,6 @@ class Train:
 
                 # Iterate over train batches
                 for batch in train_dataloader:
-
                     # Perform a train step
                     loss = model.training_step(batch)
 
@@ -81,10 +76,9 @@ class Train:
                 print(f"Entity {entity} | Train epoch {epoch} | Loss: {sum(losses) / len(losses)}")
 
             # Save PyTorch model
-            if self._export_model:
-                export_model_dir = os.path.join(output_dir, "model")
-                os.makedirs(export_model_dir, exist_ok=True)
-                torch.save(model, os.path.join(export_model_dir, self._export_model.parent.joinpath(f"{self._export_model.stem}_{entity}.pth")))
+            export_model_dir = os.path.join(output_dir, "model")
+            os.makedirs(export_model_dir, exist_ok=True)
+            torch.save(model, os.path.join(export_model_dir, f"model_{entity}.pth"))
 
         # Save model using MLEM API
         save(model, "model", sample_data=None, preprocess=None, postprocess=None)

@@ -11,7 +11,6 @@ train:
   prediction_length: 1
   num_layers: 3
   learning_rate: 0.001
-  export_model: model
 convert:
   batch_size: 1
   entity: 0

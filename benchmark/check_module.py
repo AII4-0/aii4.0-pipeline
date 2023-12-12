@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 import json
 import os
-from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -14,14 +13,13 @@ from benchmark.data_module import DataModule
 class Check:
     """This class manages the export of a model."""
 
-    def __init__(self, entity: int, export_model: Path = None) -> None:
+    def __init__(self, entity: int) -> None:
         """
         Create an object of `Trainer` class.
         :param entity: The entity to convert.
-        :param export_model: The path to the folder where the exported model is saved.
+        Whether
         """
         self._entity = entity
-        self._export_model = export_model
 
     @staticmethod
     def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
@@ -40,7 +38,7 @@ class Check:
         :param data: The data used to benchmark the model.
         :param output_dir: The output directory.
         """
-        
+
         # Get the train dataloader for the entity
         global test_dataloader
 
