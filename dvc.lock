@@ -133,3 +133,17 @@ stages:
       hash: md5
       md5: f801edba2d4038e0f686489e7a3af0b2
       size: 485
+  check:
+    cmd: python3 main.py --dataset NASA-MSL --batch_size 512 --window_size 100 --start_index_inputs_exported_in_c
+      0 --n_inputs_exported_in_c 0 --model GAN --epochs 10 --hidden_size 128 --prediction_length
+      1 --num_layers 3 --learning_rate 0.001 --export_model model --batch_size 1 --entity
+      0 --batch_size 1 --stage check
+    deps:
+    - path: benchmark/check_module.py
+      hash: md5
+      md5: cddc34947cf20fd10c7ec805412a6d93
+      size: 3630
+    - path: model.tflite
+      hash: md5
+      md5: debd9a50834672bd07bd796c5375ef52
+      size: 419976

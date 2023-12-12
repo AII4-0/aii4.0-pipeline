@@ -7,6 +7,7 @@ from benchmark.eval_module import Evaluate
 from benchmark.test_module import Test
 from benchmark.train_module import Train
 from benchmark.convert_module import Convert
+from benchmark.check_module import Check
 from models.gan import GAN
 from models.lstm import LSTM
 from models.tran_ad import TranAD
@@ -38,6 +39,7 @@ def main() -> None:
     parser = Test.add_argparse_args(parser)
     parser = Evaluate.add_argparse_args(parser)
     parser = Convert.add_argparse_args(parser)
+    parser = Check.add_argparse_args(parser)
 
     # Which model?
     parser.add_argument(
@@ -87,6 +89,7 @@ def main() -> None:
             "test",
             "evaluate",
             "convert",
+            "check",
         ],
         required=False
     )
@@ -152,6 +155,16 @@ def main() -> None:
     # Convert the model
     if args.stage == "convert":
         convert.run(data_module, output_dir)
+
+    # ------------------------------------------------------------------------
+    # Check
+    # ------------------------------------------------------------------------
+    # Check model
+    check = create_from_arguments(Check, args)
+
+    # Convert the model
+    if args.stage == "check":
+        check.run(data_module, output_dir)
 
 
 if __name__ == "__main__":

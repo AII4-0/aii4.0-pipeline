@@ -44,3 +44,8 @@ stages:
     - model_quant.tflite
     - output/export/model_quant.h
     - output/export/model_quant.cpp
+  check:
+    cmd: python3 main.py ${prepare} ${train} ${convert} ${check} --stage check
+    deps:
+    - benchmark/check_module.py
+    - model.tflite

@@ -15,3 +15,5 @@ train:
 convert:
   batch_size: 1
   entity: 0
+check:
+  batch_size: 1

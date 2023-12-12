@@ -1,0 +1,105 @@
+from argparse import ArgumentParser
+import os
+from pathlib import Path
+
+import numpy as np
+import tensorflow as tf
+import torch
+from sklearn.metrics import mean_squared_error
+
+from benchmark.data_module import DataModule
+
+
+class Check:
+    """This class manages the export of a model."""
+
+    def __init__(self, entity: int, export_model: Path = None) -> None:
+        """
+        Create an object of `Trainer` class.
+        :param entity: The entity to convert.
+        :param export_model: The path to the folder where the exported model is saved.
+        """
+        self._entity = entity
+        self._export_model = export_model
+
+    @staticmethod
+    def add_argparse_args(parent_parser: ArgumentParser) -> ArgumentParser:
+        """
+        Extend existing argparse.
+
+        :param parent_parser: The parent `ArgumentParser`.
+        :return: The extended argparse.
+        """
+        return parent_parser
+    
+    def run(self, data: DataModule, output_dir: str) -> None:
+        """
+        Run a benchmark of a model.
+
+        :param data: The data used to benchmark the model.
+        :param output_dir: The output directory.
+        """
+        
+        # Get the train dataloader for the entity
+        global test_dataloader
+
+        y, test_dataloader = data[self._entity]
+        
+        # Disable gradient calculation
+        torch.autograd.set_grad_enabled(False)
+    
+        # Load the PyTorch model
+        pytorch_model = torch.load(os.path.join(output_dir, "model", f"model_{self._entity}.pth"))
+        pytorch_model.eval()
+    
+        # Load the TFLite model and allocate tensors
+        tflite_model = "model.tflite"
+        interpreter = tf.lite.Interpreter(model_path=str(tflite_model))
+        interpreter.allocate_tensors()
+    
+        # Get the TFLite input/output tensor index
+        input_index = interpreter.get_input_details()[0]["index"]
+        output_index = interpreter.get_output_details()[0]["index"]
+    
+        # Create lists to store the predictions
+        pytorch_predictions = []
+        tflite_predictions = []
+    
+        # Iterate over test batches
+        i_input = 0
+        for x, y in test_dataloader:
+            # Perform the prediction with the PyTorch model
+            x = x[:, : -1]
+            # y = torch.tensor([[[0.0]]])
+            # pytorch_pred = pytorch_model(x, y)
+            pytorch_pred = pytorch_model(x)
+    
+            # Perform the prediction with the TFLite model
+            interpreter.set_tensor(input_index, x.numpy())
+            interpreter.invoke()
+            tflite_pred = interpreter.get_tensor(output_index)
+    
+            # Add predictions to the lists
+            pytorch_predictions.append(pytorch_pred.numpy().squeeze())
+            tflite_predictions.append(tflite_pred.squeeze())
+    
+            # Print input data
+            if i_input >=400 and i_input < 430:
+                print(f'Input i: {i_input} data : {x.numpy().reshape(-1)}')
+    
+            i_input = i_input + 1
+    
+        # Convert lists to tensors
+        pytorch_predictions = np.array(pytorch_predictions)
+        tflite_predictions = np.array(tflite_predictions)
+    
+        # Compute the mean squared error
+        mae = mean_squared_error(pytorch_predictions.flatten(), tflite_predictions.flatten())
+    
+        # Logging
+        print(f"Mean squared error: {mae:.20f}")
+        print(f'Pytorch prediction {pytorch_predictions}')
+        print(f'Tflite prediction {tflite_predictions}')
+        print(f'Tflite prediction[0:100] {tflite_predictions[0:100]}')
+        print(f'Tflite prediction[400:500] {tflite_predictions[400:500]}')
+        pass
