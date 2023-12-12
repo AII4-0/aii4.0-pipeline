@@ -141,9 +141,14 @@ stages:
     deps:
     - path: benchmark/check_module.py
       hash: md5
-      md5: cddc34947cf20fd10c7ec805412a6d93
-      size: 3630
+      md5: 6dcbc84a57c30cebca45b4c7c240bafc
+      size: 4410
     - path: model.tflite
       hash: md5
       md5: debd9a50834672bd07bd796c5375ef52
       size: 419976
+    outs:
+    - path: output/metrics/check.json
+      hash: md5
+      md5: e322f6ac4ebae6b192305117cc8e7733
+      size: 94710

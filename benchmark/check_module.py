@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import json
 import os
 from pathlib import Path
 
@@ -84,8 +85,8 @@ class Check:
             tflite_predictions.append(tflite_pred.squeeze())
     
             # Print input data
-            if i_input >=400 and i_input < 430:
-                print(f'Input i: {i_input} data : {x.numpy().reshape(-1)}')
+            # if i_input >=400 and i_input < 430:
+            #     print(f'Input i: {i_input} data : {x.numpy().reshape(-1)}')
     
             i_input = i_input + 1
     
@@ -95,11 +96,33 @@ class Check:
     
         # Compute the mean squared error
         mae = mean_squared_error(pytorch_predictions.flatten(), tflite_predictions.flatten())
-    
+
         # Logging
         print(f"Mean squared error: {mae:.20f}")
-        print(f'Pytorch prediction {pytorch_predictions}')
-        print(f'Tflite prediction {tflite_predictions}')
-        print(f'Tflite prediction[0:100] {tflite_predictions[0:100]}')
-        print(f'Tflite prediction[400:500] {tflite_predictions[400:500]}')
-        pass
+
+        # Write the check metrics
+        self._write_check_metrics({
+            "Mean squared error": mae,
+            "Pytorch prediction": pytorch_predictions,
+            "Tflite prediction": tflite_predictions,
+            "Tflite prediction[0:100]": tflite_predictions[0:100],
+            "Tflite prediction[400:500]": tflite_predictions[400:500]
+        }, output_dir)
+
+    @staticmethod
+    def _write_check_metrics(metrics: dict[str, any], output_dir: str) -> None:
+
+        # Create the metrics directory if it does not exist
+        output_dir = os.path.join(output_dir, "metrics")
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Assuming you have the path to the results file
+        eval_file = os.path.join(output_dir, "check.json")
+
+        # Transform tensor dict into serialisable items
+        json_dict = {k: v.tolist() for k, v in metrics.items()}
+
+        # Write results to json file
+        with open(eval_file, 'w') as json_file:
+            json.dump(json_dict, json_file)

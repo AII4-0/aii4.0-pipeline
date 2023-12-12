@@ -49,3 +49,5 @@ stages:
     deps:
     - benchmark/check_module.py
     - model.tflite
+    metrics:
+    - output/metrics/check.json
